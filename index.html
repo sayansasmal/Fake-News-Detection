@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>News Classifier</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 500px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            resize: none;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: #667eea;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .loading {
+            color: #888;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Real and Fake News Classification System</h1>
+        <textarea id="newsText" rows="5" placeholder="Enter news text..."></textarea>
+        <br>
+        <button onclick="predict()">Classify</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function predict() {
+            try {
+                const text = document.getElementById("newsText").value;
+                const resultDiv = document.getElementById("result");
+
+                if (!text.trim()) {
+                    resultDiv.innerText = "⚠️ Please enter some text";
+                    return;
+                }
+
+                resultDiv.innerHTML = "<span class='loading'>Analyzing...</span>";
+
+                const response = await fetch("http://localhost:8000/predict", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const data = await response.json();
+
+                resultDiv.innerText =
+                    "Prediction: " + data.prediction +
+                    " (" + data.confidence + "% confidence)";
+
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("result").innerText =
+                    "❌ Error connecting to server";
+            }
+        }
+    </script>
+</body>
+</html>
